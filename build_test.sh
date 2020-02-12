@@ -1,16 +1,21 @@
-#!/bin/bash -Ee
+#!/bin/bash -Eeu
 
 #- - - - - - - - - - - - - - - - - - - - - - -
 readonly ROOT_DIR="$( cd "$( dirname "${0}" )" && pwd )"
-export CYBER_DOJO_CREATOR_IMAGE=cyberdojo/creator_mini
-export CYBER_DOJO_CREATOR_PORT=4567
+readonly MY_NAME=bug
+readonly USERNAME=nobody
+readonly TEST_TYPE=server
+
+readonly BUG_IMAGE_NAME="cyberdojo/${MY_NAME}"
+readonly BUG_CONTAINER_NAME="test-${MY_NAME}-${TEST_TYPE}"
+readonly BUG_PORT=4567
 
 #- - - - - - - - - - - - - - - - - - - - - - -
 build_image()
 {
   docker build \
-    --build-arg CYBER_DOJO_CREATOR_PORT=${CYBER_DOJO_CREATOR_PORT} \
-    --tag ${CYBER_DOJO_CREATOR_IMAGE} \
+    --build-arg BUG_PORT=${BUG_PORT} \
+    --tag ${BUG_IMAGE_NAME} \
     "${ROOT_DIR}/app"
 }
 
@@ -23,17 +28,16 @@ ip_address()
     printf localhost
   fi
 }
-readonly IP_ADDRESS=$(ip_address)
 
 # - - - - - - - - - - - - - - - - - - - - - -
-wait_briefly_until_ready()
+wait_until_ready()
 {
-  local -r port="${1}"
-  local -r name="${2}"
-  local -r max_tries=20
+  local -r name=test-${MY_NAME}-${TEST_TYPE}
   printf "Waiting until ${name} is ready"
+  local -r max_tries=20
+  local -r ip_address=$(ip_address)
   for _ in $(seq ${max_tries}); do
-    if curl_ready ${port}; then
+    if curl_ready ${ip_address}; then
       printf '.OK\n'
       return
     else
@@ -44,7 +48,7 @@ wait_briefly_until_ready()
   printf 'FAIL\n'
   echo "not ready after ${max_tries} tries"
   if [ -f "$(ready_filename)" ]; then
-    ready_response
+    cat ready_response
   fi
   docker logs ${name}
   exit 42
@@ -53,9 +57,10 @@ wait_briefly_until_ready()
 # - - - - - - - - - - - - - - - - - - -
 curl_ready()
 {
-  local -r port="${1}"
+  local -r ip_address="${1}"
+  local -r port="${BUG_PORT}"
   local -r path=ready?
-  local -r url="http://${IP_ADDRESS}:${port}/${path}"
+  local -r url="http://${ip_address}:${port}/${path}"
   rm -f "$(ready_filename)"
   curl \
     --fail \
@@ -81,52 +86,52 @@ ready_filename()
 # - - - - - - - - - - - - - - - - - - -
 container_up()
 {
-  local -r service_name="${1}"
   printf '\n'
-  docker-compose \
-    --file "${ROOT_DIR}/docker-compose.yml" \
-    up \
+  docker container rm ${BUG_CONTAINER_NAME} --force 2> /dev/null || true
+  docker run \
     --detach \
-    --force-recreate \
-    "${service_name}"
+    --init \
+    --name "${BUG_CONTAINER_NAME}" \
+    --publish ${BUG_PORT}:${BUG_PORT} \
+    --tmpfs /tmp \
+    --user ${USERNAME} \
+    --volume ${ROOT_DIR}/test:/test:ro \
+    "${BUG_IMAGE_NAME}"
 }
 
 #- - - - - - - - - - - - - - - - - - - - - - -
 run_tests()
 {
-  local -r my_name=creator
-  local -r user="${1}" # eg nobody
-  local -r type="${2}" # eg client|server
   local -r reports_dir=reports
   local -r coverage_root=/tmp/${reports_dir}
   local -r test_log=test.log
-  local -r container_name="test-${my_name}-${type}" # eg test-creator-server
 
   echo '=================================='
-  echo "Running ${type} tests"
+  echo "Running ${TEST_TYPE} tests"
   echo '=================================='
 
   set +e
   docker exec \
-    --user "${user}" \
-    "${container_name}" \
-      sh -c "/test/run.sh ${coverage_root} ${test_log} ${type}"
+    --user "${USERNAME}" \
+    "${BUG_CONTAINER_NAME}" \
+      sh -c "/test/run.sh ${coverage_root} ${test_log} ${TEST_TYPE}"
   set -e
 
   # You can't [docker cp] from a tmpfs, so tar-piping coverage out...
-  local -r test_dir="${ROOT_DIR}/test/${type}" # ...to this dir
+  local -r test_dir="${ROOT_DIR}/test/${TEST_TYPE}" # ...to this dir
   docker exec \
-    "${container_name}" \
+    "${BUG_CONTAINER_NAME}" \
     tar Ccf \
       "$(dirname "${coverage_root}")" \
       - "$(basename "${coverage_root}")" \
         | tar Cxf "${test_dir}/" -
 
-  echo "Test files copied to test/${type}/${reports_dir}/"
+  echo "Coverage files copied to test/${TEST_TYPE}/${reports_dir}/"
 }
 
 #- - - - - - - - - - - - - - - - - - - - - - -
 build_image
-container_up creator-server
-wait_briefly_until_ready ${CYBER_DOJO_CREATOR_PORT} test-creator-server
-run_tests nobody server
+container_up
+wait_until_ready
+run_tests
+open "${ROOT_DIR}/test/${TEST_TYPE}/reports/index.html"

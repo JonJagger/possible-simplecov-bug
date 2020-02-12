@@ -19,8 +19,8 @@ RUN apk add --update --upgrade --virtual build-dependencies build-base \
 
 COPY --chown=nobody:nogroup . .
 
-ARG CYBER_DOJO_CREATOR_PORT
-ENV PORT=${CYBER_DOJO_CREATOR_PORT}
+ARG BUG_PORT
+ENV PORT=${BUG_PORT}
 EXPOSE ${PORT}
 
 USER nobody
