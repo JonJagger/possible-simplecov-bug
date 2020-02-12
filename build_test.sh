@@ -6,11 +6,12 @@ export CYBER_DOJO_CREATOR_IMAGE=cyberdojo/creator_mini
 export CYBER_DOJO_CREATOR_PORT=4567
 
 #- - - - - - - - - - - - - - - - - - - - - - -
-build_images()
+build_image()
 {
-  docker-compose \
-    --file "${ROOT_DIR}/docker-compose.yml" \
-    build
+  docker build \
+    --build-arg CYBER_DOJO_CREATOR_PORT=${CYBER_DOJO_CREATOR_PORT} \
+    --tag ${CYBER_DOJO_CREATOR_IMAGE} \
+    "${ROOT_DIR}/app"
 }
 
 # - - - - - - - - - - - - - - - - - - - - - -
@@ -125,7 +126,7 @@ run_tests()
 }
 
 #- - - - - - - - - - - - - - - - - - - - - - -
-build_images
+build_image
 container_up creator-server
 wait_briefly_until_ready ${CYBER_DOJO_CREATOR_PORT} test-creator-server
 run_tests nobody server

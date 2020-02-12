@@ -1,10 +1,10 @@
-Run options: --seed 55837
+Run options: --seed 48298
 
 # Running:
 
 .
 
-Finished in 0.001539s, 649.7654 runs/s, 649.7654 assertions/s.
+Finished in 0.001080s, 926.2433 runs/s, 926.2433 assertions/s.
 
 1 runs, 1 assertions, 0 failures, 0 errors, 0 skips
 /app/src/creator.rb
