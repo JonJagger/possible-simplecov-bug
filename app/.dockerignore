@@ -1,0 +1,5 @@
+*
+!src/
+!Gemfile
+!config.ru
+!up.sh
