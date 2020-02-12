@@ -1,7 +1,7 @@
 
 # build_test.sh
-This relies on `docker` and `curl`.
-It will:
+`build_test.sh` relies on `docker` and `curl`.
+When it runs it will:
 - build the docker image
 - run a container from the image
 - run the tests inside the container
