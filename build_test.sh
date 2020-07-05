@@ -35,9 +35,9 @@ wait_until_ready()
   local -r name=test-${MY_NAME}-${TEST_TYPE}
   printf "Waiting until ${name} is ready"
   local -r max_tries=20
-  local -r ip_address=$(ip_address)
+  local -r my_ip_address=$(ip_address)
   for _ in $(seq ${max_tries}); do
-    if curl_ready ${ip_address}; then
+    if curl_ready ${my_ip_address}; then
       printf '.OK\n'
       return
     else
