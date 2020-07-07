@@ -133,5 +133,6 @@ run_tests()
 build_image
 container_up
 wait_until_ready
+rm "${ROOT_DIR}/test/${TEST_TYPE}/reports/index.html"
 run_tests
 open "${ROOT_DIR}/test/${TEST_TYPE}/reports/index.html"

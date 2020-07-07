@@ -2,7 +2,7 @@ FROM ruby:alpine
 LABEL maintainer=jon@jaggersoft.com
 
 # tar is needed to tar-pipe test coverage out of /tmp tmpfs
-RUN apk --update --upgrade --no-cache add bash tar
+RUN apk --update --upgrade --no-cache add bash tar git
 
 WORKDIR /app
 COPY Gemfile .

@@ -19,5 +19,5 @@ export RUBYOPT='-W2'
 mkdir -p ${COVERAGE_ROOT}
 
 set +e
-ruby -e "${SCRIPT}" -- ${TEST_ARGS[@]} 2>&1 | tee ${COVERAGE_ROOT}/${TEST_LOG}
+bundle exec ruby -e "${SCRIPT}" -- ${TEST_ARGS[@]} 2>&1 | tee ${COVERAGE_ROOT}/${TEST_LOG}
 set -e

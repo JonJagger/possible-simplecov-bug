@@ -11,18 +11,21 @@ When it runs it will:
 # 0.17.0
 `app/Gemfile` contains
 ```
-gem 'simplecov', "0.17.0"
+gem 'simplecov', '0.17.0'
 ```
 Run `build_test.sh`
-The coverage has one entry for the `app` and `test` groups.
+index.html has several entries/tabs; `app` and `test` both contain at least one file :-)
 
-# 0.18.1
-Edit `app/Gemfile` to
+# 0.18.5
+Edit `app/Gemfile` to either of these...
 ```
-gem 'simplecov', "0.18.1"
+gem 'simplecov', '0.18.5'
+gem 'simplecov', github: 'colszowka/simplecov'
 ```
 Run `build_test.sh`
-The coverage has one entry for the `app` group but none for `test` group :-(
+index.html has several entries/tabs; `test` is now empty :-(
+
+
 
 # Notes
 - The tests are run from `test/run.sh`

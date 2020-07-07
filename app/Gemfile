@@ -3,5 +3,6 @@ source 'https://rubygems.org'
 gem 'json'
 gem 'minitest'
 gem 'rack'
-gem 'simplecov', "0.17.0"
+gem 'simplecov', '0.17.0'
+#gem 'simplecov', github: 'colszowka/simplecov'
 gem 'thin'
