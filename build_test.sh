@@ -118,15 +118,15 @@ run_tests()
   set -e
 
   # You can't [docker cp] from a tmpfs, so tar-piping coverage out...
-  local -r test_dir="${ROOT_DIR}/test/${TEST_TYPE}" # ...to this dir
-  docker exec \
-    "${BUG_CONTAINER_NAME}" \
-    tar Ccf \
-      "$(dirname "${coverage_root}")" \
-      - "$(basename "${coverage_root}")" \
-        | tar Cxf "${test_dir}/" -
-
-  echo "Coverage files copied to test/${TEST_TYPE}/${reports_dir}/"
+  #local -r test_dir="${ROOT_DIR}/test/${TEST_TYPE}" # ...to this dir
+  #docker exec \
+  #  "${BUG_CONTAINER_NAME}" \
+  #  tar Ccf \
+  #    "$(dirname "${coverage_root}")" \
+  #    - "$(basename "${coverage_root}")" \
+  #      | tar Cxf "${test_dir}/" -
+  #
+  #echo "Coverage files copied to test/${TEST_TYPE}/${reports_dir}/"
 }
 
 #- - - - - - - - - - - - - - - - - - - - - - -
@@ -135,4 +135,4 @@ container_up
 wait_until_ready
 rm -f "${ROOT_DIR}/test/${TEST_TYPE}/reports/index.html"
 run_tests
-open "${ROOT_DIR}/test/${TEST_TYPE}/reports/index.html"
+#open "${ROOT_DIR}/test/${TEST_TYPE}/reports/index.html"
