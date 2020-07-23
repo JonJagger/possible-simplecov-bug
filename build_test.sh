@@ -3,7 +3,7 @@
 #- - - - - - - - - - - - - - - - - - - - - - -
 readonly ROOT_DIR="$( cd "$( dirname "${0}" )" && pwd )"
 readonly MY_NAME=bug
-readonly USERNAME=nobody
+readonly USERNAME=root
 readonly TEST_TYPE=server
 
 readonly BUG_IMAGE_NAME="cyberdojo/${MY_NAME}"
@@ -133,6 +133,6 @@ run_tests()
 build_image
 container_up
 wait_until_ready
-rm "${ROOT_DIR}/test/${TEST_TYPE}/reports/index.html"
+rm -f "${ROOT_DIR}/test/${TEST_TYPE}/reports/index.html"
 run_tests
 open "${ROOT_DIR}/test/${TEST_TYPE}/reports/index.html"
